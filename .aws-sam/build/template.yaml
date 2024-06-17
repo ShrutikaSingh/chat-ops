@@ -1,0 +1,43 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: AWS::Serverless-2016-10-31
+Resources:
+  IntegrationLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: lambda_function.lambda_handler
+      Runtime: python3.12
+      CodeUri: IntegrationLambdaFunction
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      - Statement:
+        - Effect: Allow
+          Action:
+          - lambda:InvokeFunction
+          Resource:
+            Fn::GetAtt:
+            - PrintHelloWorldLambdaFunction
+            - Arn
+      Events:
+        IntegrationEvent:
+          Type: Api
+          Properties:
+            Path: /integration
+            Method: post
+    Metadata:
+      SamResourceId: IntegrationLambdaFunction
+  PrintHelloWorldLambdaFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      Handler: hello_world.lambda_handler
+      Runtime: python3.12
+      CodeUri: PrintHelloWorldLambdaFunction
+      Policies:
+      - AWSLambdaBasicExecutionRole
+      Events:
+        HelloWorldGetEvent:
+          Type: Api
+          Properties:
+            Path: /hello-world
+            Method: get
+    Metadata:
+      SamResourceId: PrintHelloWorldLambdaFunction
